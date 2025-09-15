@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuth } from "@/lib/auth"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import ReactConfetti from "react-confetti"
+import { console } from "inspector"
 
 export default function LoginForm() {
   const [email, setEmail] = useState("")
@@ -29,15 +30,24 @@ export default function LoginForm() {
     setError("")
     setIsLoading(true)
 
-    try {
+    const res = await fetch("/api/sign-in", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    setIsLoading(false);
+
+    if (res.ok) {
+      // Optionally redirect or show success
+      // Redirect to sign-in page
       await login(email, password)
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 30000)
-      router.push("/dashboard")
-    } catch (err) {
-      setError("Invalid email or password")
-    } finally {
-      setIsLoading(false)
+      router.push("/dashboard");
+    } else {
+      console.error(data.error || "Sign up failed, Invalid email or password");
     }
   }
 
@@ -45,8 +55,8 @@ export default function LoginForm() {
     <>
 
       {showConfetti && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
-          <ReactConfetti width={window.innerWidth} height={window.innerHeight} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md w-full">
+          <ReactConfetti width={window.innerWidth} height={window.innerHeight} className="w-full" />
           <div className="absolute inset-0 flex items-center justify-center">
             <h1 className="text-4xl font-bold text-white drop-shadow-lg">Congratulations!</h1>
           </div>

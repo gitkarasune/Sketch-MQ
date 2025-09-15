@@ -27,6 +27,7 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setIsLoading(true)
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")
@@ -37,8 +38,7 @@ export default function RegisterForm() {
       setError("Password must be at least 8 characters long")
       return
     }
-
-    setIsLoading(true)
+    
 
     try {
       await register(email, password, name)
